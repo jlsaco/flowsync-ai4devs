@@ -1,32 +1,22 @@
-# React + TypeScript + Vite
+# FlowSync — frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React 19 + Vite 8 (TypeScript), Tailwind CSS v4 y componentes [shadcn/ui](https://ui.shadcn.com) (`src/components/ui/`, config en `components.json`). Lint con oxlint.
 
-Currently, two official plugins are available:
+## Puesta en marcha
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev      # http://localhost:5173 (necesita el backend en http://localhost:3333)
+npm run build    # tsc -b && vite build
+npm run lint     # oxlint
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+En desarrollo, Vite hace proxy de `/api` → `http://localhost:3333`, así que el frontend llama a la API en el mismo origen. Para apuntar a otra URL (p. ej. en producción) define `VITE_API_URL` (sin barra final); por defecto es vacío (mismo origen).
+
+Añadir componentes de shadcn: `npx shadcn@latest add <componente>`.
+
+## Estructura
+
+- `src/lib/api.ts` — cliente de la API (`/api/v1`): desempaqueta `{ data }` y traduce los errores del backend (`{ errors: [...] }`) a `ApiError` con mensajes en español y errores por campo.
+- `src/auth/` — sesión: `AuthProvider` guarda el access token en `localStorage` (`flowsync.token`), `useAuth()` lo expone y `RequireAuth` / `GuestOnly` protegen las rutas.
+- `src/pages/` — `/login`, `/signup` (solo invitados) y `/profile` (protegida; consume `GET /api/v1/account/profile`). Un 401 en el perfil cierra la sesión local y vuelve a `/login`.
