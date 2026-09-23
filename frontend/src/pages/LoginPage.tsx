@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { CircleAlert } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/card'
 import { FormField } from '@/components/FormField'
 import { useAuth } from '@/auth/useAuth'
-import { ApiError, login } from '@/lib/api'
+import { ApiError, login, normalizeEmail } from '@/lib/api'
 
 export function LoginPage() {
   const { setToken } = useAuth()
@@ -22,18 +22,23 @@ export function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<ApiError | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  // Evita envíos concurrentes (p. ej. Enter repetido) antes de que se pinte el botón deshabilitado
+  const inFlight = useRef(false)
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    if (inFlight.current) return
+    inFlight.current = true
     setError(null)
     setSubmitting(true)
     try {
-      const { token } = await login(email.trim(), password)
+      const { token } = await login(normalizeEmail(email), password)
       setToken(token)
       navigate('/profile', { replace: true })
     } catch (err) {
       setError(err instanceof ApiError ? err : new ApiError(0, 'Ha ocurrido un error inesperado.'))
     } finally {
+      inFlight.current = false
       setSubmitting(false)
     }
   }

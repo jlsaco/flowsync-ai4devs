@@ -90,6 +90,14 @@ async function toApiError(response: Response): Promise<ApiError> {
   return new ApiError(response.status, response.status >= 500 ? NETWORK_ERROR : GENERIC_ERROR)
 }
 
+/**
+ * El backend compara emails de forma case-sensitive (unique + verifyCredentials):
+ * normalizamos para no crear cuentas duplicadas ni fallar el login por mayúsculas.
+ */
+export function normalizeEmail(email: string) {
+  return email.trim().toLowerCase()
+}
+
 type RequestOptions = {
   method?: 'GET' | 'POST'
   body?: unknown
