@@ -30,7 +30,9 @@ export function SignupPage() {
     else if (password.length < 8) {
       errors.password = 'Debe tener al menos 8 caracteres.'
     }
-    if (password && passwordConfirmation !== password) {
+    if (!passwordConfirmation) {
+      errors.passwordConfirmation = 'Confirma tu contraseña.'
+    } else if (passwordConfirmation !== password) {
       errors.passwordConfirmation = 'Las contraseñas no coinciden.'
     }
     setFieldErrors(errors)

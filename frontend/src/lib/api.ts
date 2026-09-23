@@ -36,6 +36,8 @@ export class ApiError extends Error {
 
 const NETWORK_ERROR =
   'No se pudo conectar con el servidor. Inténtalo de nuevo en unos minutos.'
+const SERVER_ERROR =
+  'El servidor ha tenido un problema. Inténtalo de nuevo en unos minutos.'
 const GENERIC_ERROR = 'Algo ha fallado. Inténtalo de nuevo.'
 
 /** Traduce un error de validación de VineJS a un mensaje en español. */
@@ -55,15 +57,11 @@ function fieldMessage({ field, rule }: BackendError): string {
   return 'El valor no es válido.'
 }
 
-async function toApiError(response: Response, path: string): Promise<ApiError> {
+async function toApiError(response: Response): Promise<ApiError> {
   const body = (await response.json().catch(() => null)) as {
     errors?: BackendError[]
   } | null
   const errors = body?.errors ?? []
-
-  if (response.status === 400 && path === '/auth/login') {
-    return new ApiError(400, 'Email o contraseña incorrectos.')
-  }
 
   if (response.status === 401) {
     return new ApiError(401, 'Tu sesión ha caducado. Inicia sesión de nuevo.')
@@ -84,7 +82,7 @@ async function toApiError(response: Response, path: string): Promise<ApiError> {
 
   return new ApiError(
     response.status,
-    response.status >= 500 ? NETWORK_ERROR : GENERIC_ERROR,
+    response.status >= 500 ? SERVER_ERROR : GENERIC_ERROR,
   )
 }
 
@@ -108,12 +106,16 @@ async function request<T>(
     throw new ApiError(0, NETWORK_ERROR)
   }
 
-  if (!response.ok) throw await toApiError(response, path)
+  if (!response.ok) throw await toApiError(response)
 
-  const payload = (await response.json().catch(() => null)) as {
-    data?: T
-  } | null
-  return payload?.data as T
+  return (await response.json().catch(() => null)) as T
+}
+
+/** Como `request`, pero desempaqueta el `{ data }` de `ctx.serialize`. */
+async function requestData<T>(...args: Parameters<typeof request>): Promise<T> {
+  const payload = await request<{ data?: T } | null>(...args)
+  if (payload?.data === undefined) throw new ApiError(0, GENERIC_ERROR)
+  return payload.data
 }
 
 /**
@@ -127,7 +129,7 @@ export function signup(
   password: string,
   passwordConfirmation: string,
 ) {
-  return request<AuthResponse>('POST', '/auth/signup', {
+  return requestData<AuthResponse>('POST', '/auth/signup', {
     body: {
       fullName: null,
       email: normalizeEmail(email),
@@ -137,16 +139,25 @@ export function signup(
   })
 }
 
-export function login(email: string, password: string) {
-  return request<AuthResponse>('POST', '/auth/login', {
-    body: { email: normalizeEmail(email), password },
-  })
+export async function login(email: string, password: string) {
+  try {
+    return await requestData<AuthResponse>('POST', '/auth/login', {
+      body: { email: normalizeEmail(email), password },
+    })
+  } catch (error) {
+    // El backend responde 400 (E_INVALID_CREDENTIALS) tanto si el email no
+    // existe como si la contraseña no coincide.
+    if (error instanceof ApiError && error.status === 400) {
+      throw new ApiError(400, 'Email o contraseña incorrectos.')
+    }
+    throw error
+  }
 }
 
 export function getProfile(token: string) {
-  return request<User>('GET', '/account/profile', { token })
+  return requestData<User>('GET', '/account/profile', { token })
 }
 
 export function logout(token: string) {
-  return request<unknown>('POST', '/account/logout', { token })
+  return request<{ message: string }>('POST', '/account/logout', { token })
 }
