@@ -134,10 +134,10 @@ Etiquetas:
 
 **CA-20 · La tarea ya no existe** `PRD · RF-12`
 - **DADO** que otra persona acaba de borrar una tarea
-- **CUANDO** intento ponerle o cambiarle la fecha
+- **CUANDO** intento ponerle, cambiarle o quitarle la fecha
 - **ENTONCES** se me avisa de que la tarea ya no existe
 - **Y** no se crea ni se recupera nada.
 
 ## Fuera de esta historia
 
-Por el NO-alcance del PRD: recordatorios o avisos de vencimiento (RF-22), fecha con hora y vista de calendario.
+Recordatorios o avisos de vencimiento (RF-22), fecha con hora (RF-13: la fecha no lleva hora) y vista de calendario (fuera en la sección 4 del PRD).

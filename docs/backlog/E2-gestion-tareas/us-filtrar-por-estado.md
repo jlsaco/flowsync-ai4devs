@@ -79,19 +79,19 @@ Los estados son los del PRD (`[SUPUESTO]` de RF-7): «Por hacer», «En curso» 
 - **CUANDO** filtro por un estado
 - **ENTONCES** se me avisa del problema
 - **Y** no veo un «no hay tareas» que parezca un resultado real.
-- Reutiliza el aviso de desconexión de RF-20.
+- Relacionado con RF-20 (aviso cuando se pierden los cambios en vivo), que no cubre por sí solo este caso: fallar al cargar o filtrar.
 
 ### C. Estado que no existe
 
-**CA-11 · Se avisa del error** `PEDIDO`
+**CA-11 · Se avisa del error** `PEDIDO · detalle 🔶`
 - **DADO** que se pide filtrar por un estado que no existe
 - **CUANDO** se aplica esa petición
 - **ENTONCES** el sistema avisa en castellano de que ese estado no existe
 - **Y** indica cuáles son los válidos: «Por hacer», «En curso» y «Hecha»
 - **Y** no presenta el resultado como una lista vacía ni como «no hay tareas».
-- *Con el PRD actual, la interfaz solo ofrece tres estados fijos y el filtro se olvida al recargar, por lo que este caso solo puede darse si existen filtros guardados o compartidos, o si un estado se retira en el futuro. Hoy ese punto de entrada no existe.*
+- *Con el PRD actual, la interfaz solo ofrece tres estados fijos y el filtro se olvida al recargar, por lo que este caso solo puede darse si existen filtros guardados o compartidos, o si un estado se retira en el futuro. Ni los filtros guardados o compartidos ni el retiro de estados están previstos en el PRD: hoy ese punto de entrada no existe.*
 
-**CA-12 · Qué se ve tras el aviso** `PEDIDO · detalle 🔶`
+**CA-12 · Qué se ve tras el aviso** 🔶 **PROPUESTA**
 - **DADO** el aviso del criterio anterior
 - **CUANDO** lo veo
 - **ENTONCES** queda claro que no se ha aplicado ningún filtro
@@ -103,7 +103,7 @@ Los estados son los del PRD (`[SUPUESTO]` de RF-7): «Por hacer», «En curso» 
 
 **CA-13 · Otra persona lleva una tarea al estado filtrado** `PRD · RF-19`
 - **DADO** el filtro «En curso» y mi lista abierta
-- **CUANDO** otra persona crea una tarea o cambia una a «En curso»
+- **CUANDO** otra persona cambia una tarea a «En curso»
 - **ENTONCES** aparece en mi lista filtrada sin que yo recargue.
 
 **CA-14 · Otra persona saca una tarea del estado filtrado** `PRD · RF-19`
@@ -115,9 +115,9 @@ Los estados son los del PRD (`[SUPUESTO]` de RF-7): «Por hacer», «En curso» 
 - **DADO** el filtro «Por hacer»
 - **CUANDO** cambio una tarea a «En curso»
 - **ENTONCES** deja de aparecer en mi lista filtrada en ese momento.
-- Coincide con lo que ya hace RF-17 al marcar «Hecha». Tiene el mismo riesgo: la fila desaparece, sin deshacer (PA-6 y PA-7 del PRD).
+- Coincide con lo que ya hace RF-17 al marcar «Hecha». Tiene el mismo riesgo: la fila desaparece, sin deshacer (PA-7 del PRD).
 - *Alternativa a decidir:* mantenerla visible hasta la siguiente acción.
 
 ## Fuera de esta historia
 
-Por el NO-alcance del PRD: buscar por texto, guardar filtros y ordenar de otra manera. Seleccionar dos estados a la vez no está en el PRD y queda fuera de alcance MVP.
+Por el NO-alcance del PRD (sección 4): buscar por texto y el orden personalizado. Además, guardar filtros y seleccionar dos estados a la vez no están en el PRD: quedan fuera de esta historia y de alcance MVP por decisión del autor, pendiente de confirmar.
