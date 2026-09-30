@@ -1,6 +1,6 @@
 # Alcance del MVP de FlowSync
 
-- **Estado:** consensuado, base del PRD (el PRD aún no está escrito).
+- **Estado:** base del PRD (el PRD aún no está escrito). Acordado con el usuario, salvo lo marcado como *propuesta del autor* y lo listado en «Decisiones abiertas».
 - **Fecha:** 2026-09-30
 - **Nivel:** producto. Modelo de datos, endpoints, estados internos y requisitos técnicos se deciden en el PRD y en el diseño posterior.
 
@@ -9,9 +9,11 @@
 Un equipo remoto pequeño no puede ver quién está en qué sin interrumpir a alguien. Hoy eso se paga de dos formas:
 
 - **La daily de sincronización.** La ronda de «¿en qué estás?» se come la mitad de los 15 minutos.
-- **El «¿en qué estás?» constante por Slack o chat.** Nadie ve el estado del equipo sin interrumpir a otra persona.
+- **El «¿en qué estás?» constante por Slack o chat.** Nadie ve el estado del equipo sin interrumpir a otra persona. El chat es el canal por el que se paga el problema, no el problema en sí.
 
-Cuesta caro cuando dos personas trabajan sobre lo mismo sin saberlo. Episodio concreto: dos personas tocaron el mismo módulo la misma semana porque una empezó sin que la otra lo supiera, y se perdieron dos días.
+«La mitad de los 15 minutos» es una estimación de quien plantea el producto, no una medición.
+
+Cuesta caro cuando dos personas trabajan sobre lo mismo sin saberlo. Episodio concreto, relatado por quien plantea el producto: dos personas tocaron el mismo módulo la misma semana porque una empezó sin que la otra lo supiera, y se perdieron dos días.
 
 La parte de bloqueos de la daily **no** es el problema que resuelve este MVP.
 
@@ -29,7 +31,7 @@ La parte de bloqueos de la daily **no** es el problema que resuelve este MVP.
 **Qué hace distinto a FlowSync**
 
 - **Es donde se hace el trabajo, no donde se cuenta.** Sustituye al gestor de tareas y no convive con él. FlowSync crea sus propias tareas y no lee las de otro sitio, porque convivir obliga a actualizar dos veces.
-- **Menos rollo que Jira** significa crear una tarea y cambiarle el estado en segundos, sin flujos de configuración ni campos obligatorios. Es lo mínimo para saber quién está en qué.
+- **Menos rollo que Jira** significa crear una tarea y cambiarle el estado en segundos, sin flujos de configuración ni campos obligatorios más allá del título. Es lo mínimo para saber quién está en qué.
 - **«Tiempo real» es frescura, no presencia.** Se ven los cambios de estado de las tareas sin refrescar ni preguntar. El estado es de la tarea, no de la persona. No es chat, ni videollamada, ni edición simultánea de un documento.
 - **La señal es un resumen que espera, no un aviso que interrumpe.** El caso de uso es llegar por la mañana, o volver de una reunión, y ver qué se ha movido.
 
@@ -51,10 +53,10 @@ Quien escribe el estado cobra en el mismo momento. Son dos clics sobre una lista
 Una vertical fina y usable de punta a punta. Se prefiere una capability terminada a tres a medias.
 
 1. **Crear una tarea** con título como único dato obligatorio. La tarea puede tener responsable; una tarea sin responsable significa «libre».
-2. **Cambiar el estado en dos clics** sobre la lista ya abierta. Hay pocos estados y ningún campo obligatorio. El conjunto exacto se decide en el PRD.
+2. **Cambiar el estado en dos clics** sobre la lista ya abierta. Hay pocos estados y ningún campo obligatorio aparte del título. El conjunto exacto se decide en el PRD.
 3. **Ver los cambios de los demás sin refrescar.**
 4. **Filtrar por estado**, para centrarse en lo pendiente.
-5. **Marca de «cambió desde tu última visita»**, para el caso de llegar por la mañana y ver qué se ha movido. No es un feed de actividad ni un informe.
+5. **Marca de «cambió desde tu última visita»**, para el caso de llegar por la mañana y ver qué se ha movido. No es un feed de actividad ni un informe. *Propuesta del autor, no pedida por el usuario; pendiente de confirmar.* Sin definir todavía: qué cuenta como «visita» y si los cambios propios y las tareas nuevas se marcan.
 6. **Fecha de vencimiento**, opcional, para ver de un vistazo qué se ha pasado de plazo. Es el **primer candidato a recorte** si hay presión de alcance: no afecta a las decisiones que el MVP quiere cambiar.
 7. **Un espacio único compartido**, con el registro e inicio de sesión que ya existen.
 
@@ -76,11 +78,24 @@ Una vertical fina y usable de punta a punta. Se prefiere una capability terminad
 | Importar tareas de otros gestores y convivir con ellos | FlowSync sustituye al gestor. Convivir obliga a actualizar dos veces. Se acepta el coste de volver a teclear. |
 | Edición simultánea sobre el mismo documento | «Tiempo real» aquí es frescura del estado de las tareas. |
 | App móvil nativa, integración con Slack | Son canales adicionales sobre una hipótesis aún sin validar. |
-| Registro controlado por invitación | Fuera del MVP, pero es **requisito previo a cualquier uso real** con datos de un equipo: hoy cualquiera que se registre vería el espacio compartido. Por defecto, una instancia por equipo. |
+| Registro controlado por invitación | Fuera del MVP. Hoy no existe espacio compartido ni tareas, así que no hay nada expuesto. Pero cuando exista, el registro abierto significará que cualquiera que se registre podrá ver y editar las tareas del equipo. Ver «Decisiones abiertas». |
 
 ## Supuestos anotados
 
 - Un único espacio compartido por instancia; no existe la entidad «equipo».
 - Una instancia por equipo mientras no haya acceso controlado.
 - El equipo de referencia es un caso de estudio; la validación real requiere un equipo real.
-- Sin migración de tareas existentes: se aceptan volver a crearlas en FlowSync.
+- Sin migración de tareas existentes: se acepta volver a crearlas en FlowSync.
+
+## Decisiones abiertas
+
+Salieron de la revisión adversarial del PR. Son decisiones de producto y no están resueltas; el PRD debe cerrarlas o descartarlas explícitamente.
+
+1. **Acceso y validación.** El criterio de éxito exige una semana de uso real con un equipo, pero el registro controlado y la separación por equipo están fuera del MVP. Falta decidir quién resuelve el acceso para que la validación sea posible.
+2. **Ver «quién está en qué».** El único filtro es por estado. No hay filtro por responsable, ni forma de asignar una tarea a otra persona, ni búsqueda. La hipótesis 2 (evitar solapes) depende de poder comprobar si alguien ya está en un módulo.
+3. **Ciclo de vida de la tarea.** No está definido editar el título, borrar o cerrar una tarea, ni si las «hechas» salen de la vista por defecto. Afecta a la hipótesis 1: una lista que se llena de tareas terminadas envejece.
+4. **Sustituir al gestor actual.** Sin descripción, comentarios ni prioridad, no está claro que el equipo de referencia pueda hacer su trabajo solo en FlowSync. Abandonar el gestor actual es un riesgo de adopción que no figura entre las hipótesis.
+5. **Tiempo real frente a uso asíncrono.** El caso de referencia está en 3 husos horarios y el consumo descrito es «llego por la mañana y veo qué se ha movido». Falta justificar que el «sin refrescar» aporte algo sobre la marca de cambios, y con qué frescura mínima.
+6. **Fecha de vencimiento.** Contradice el criterio «sin campos que no cambien las decisiones del MVP». Se mantiene porque se pidió; la revisión recomienda sacarla del alcance.
+7. **Estado de la tarea frente a vigilancia.** «Quién está en qué» sale del responsable de cada tarea. Falta una frase que trace la diferencia entre eso y los indicadores de presencia que se rechazan.
+8. **Medición del éxito.** No se define cómo se mide que el equipo «cancela» la ronda, quién lo decide, ni el umbral de la señal de fracaso temprana. La hipótesis 1 se acepta como riesgo sin mitigación adicional (no hay notificaciones a propósito).
